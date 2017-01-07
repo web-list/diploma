@@ -3,6 +3,10 @@ language: php
 rvm:
  - 5.6
 
+before_script:
+ - php composer-setup.php
+ - php composer.phar install
+
 script:
  - cd protected/tests
  - phpunit --verbose unit
