@@ -6,7 +6,8 @@ rvm:
 before_script:
  - php composer-setup.php
  - php composer.phar install
+ - php composer.phar update
 
 script:
  - cd protected/tests
- - phpunit --verbose unit
+ - ../../vendor/bin/phpunit --verbose unit
