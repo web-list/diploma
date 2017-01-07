@@ -21,6 +21,7 @@ class User extends CActiveRecord
   public function rules() {
     return [
       ['login, password', 'length', 'max' => 255],
+      ['login', 'unique'],
       ['id, login, password', 'safe', 'on' => 'search'],
     ];
   }

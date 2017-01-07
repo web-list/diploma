@@ -1,20 +1,70 @@
 <?php
-/* @var $this SiteController */
+/**
+ * @var $this SiteController
+ * @var $order Order
+ */
 
-$this->pageTitle=Yii::app()->name;
-?>
+$this->pageTitle = Yii::app()->name;
 
-<h1>Welcome to <i><?php echo CHtml::encode(Yii::app()->name); ?></i></h1>
+/** @var CActiveForm $form */
+$form = $this->beginWidget("CActiveForm"); ?>
 
-<p>Congratulations! You have successfully created your Yii application.</p>
+<div class="form p20">
 
-<p>You may change the content of this page by modifying the following two files:</p>
-<ul>
-	<li>View file: <code><?php echo __FILE__; ?></code></li>
-	<li>Layout file: <code><?php echo $this->getLayoutFile('main'); ?></code></li>
-</ul>
+  <div class="row">
+    <?= $form->labelEx($order, "userLogin") ?>
+    <?= $form->textField($order, "userLogin"); ?>
+    <?= $form->error($order, "userLogin"); ?>
+  </div>
 
-<p>For more details on how to further develop this application, please read
-the <a href="http://www.yiiframework.com/doc/">documentation</a>.
-Feel free to ask in the <a href="http://www.yiiframework.com/forum/">forum</a>,
-should you have any questions.</p>
+  <div class="row">
+    <?= $form->labelEx($order, "userPassword") ?>
+    <?= $form->passwordField($order, "userPassword"); ?>
+    <?= $form->error($order, "userPassword"); ?>
+  </div>
+
+  <div class="row">
+    <?= $form->labelEx($order, "type") ?>
+    <?= $form->dropDownList($order, "type", Order::$typeTitles); ?>
+  </div>
+
+  <div class="row">
+    <?= $form->labelEx($order, "deliveryType") ?>
+    <?= $form->dropDownList($order, "deliveryType", Order::$deliveryTypeTitles); ?>
+  </div>
+
+  <?php foreach (Order::$deliveryTypeTitles as $type => $title): ?>
+    <?php $days = Order::getDeliveryDayOfMonth($type); ?>
+
+    <?php if (count($days)): ?>
+      <div class="row js-day" data-type="<?= $type ?>">
+        <?= $form->labelEx($order, "deliveryDayOfTheMonth") ?>
+        <?= $form->dropDownList($order, "deliveryDayOfTheMonth", $days); ?>
+      </div>
+    <?php endif; ?>
+
+  <?php endforeach; ?>
+
+
+  <div class="row">
+    <?= CHtml::submitButton("Оформить заказ"); ?>
+  </div>
+
+</div>
+<?php $this->endWidget(); ?>
+
+<script>
+
+  var toggleDeliveryDayField = function () {
+    $(".js-day").hide();
+
+    var type = $("#Order_deliveryType").val();
+
+    $(".js-day[data-type='" + type + "']").show();
+
+  };
+
+  $("#Order_deliveryType").on("change", toggleDeliveryDayField);
+  toggleDeliveryDayField();
+
+</script>

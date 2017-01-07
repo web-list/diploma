@@ -15,6 +15,9 @@
 class Order extends CActiveRecord
 {
 
+  public $userLogin;
+  public $userPassword;
+
   public $deliveryType;
   public $deliveryDayOfTheMonth;
 
@@ -61,7 +64,10 @@ class Order extends CActiveRecord
 
   public function rules() {
     return [
-      ['type, user_id', 'numerical', 'integerOnly' => true],
+      ['type, user_id, deliveryDayOfTheMonth', 'numerical', 'integerOnly' => true],
+      ['userLogin, userPassword', 'required', 'on' => 'newOrder'],
+      ['userLogin', 'validateLogin', 'on' => 'newOrder'],
+      ['deliveryType', 'safe', 'on' => 'newOrder'],
       ['id, type, user_id', 'safe', 'on' => 'search'],
     ];
   }
@@ -153,6 +159,66 @@ class Order extends CActiveRecord
 
   public function getStartFrom() {
     return $this->delivery_started ?: $this->created;
+  }
+
+  public static function getDeliveryDayOfMonth($deliveryType) {
+    $array = [];
+
+    for ($i = 0; $i++ < 30;) {
+
+      $label = null;
+
+      if ($deliveryType == self::DELIVERY_TYPE_ONCE_IN_TWO_MONTHS) {
+        $label = "$i числа каждого второго месяца";
+      }
+      if ($deliveryType == self::DELIVERY_TYPE_MONTHLY) {
+        $label = "$i числа каждого месяца";
+      }
+      if ($deliveryType == self::DELIVERY_TYPE_TWICE_A_MONTH) {
+        if ($i > 15) continue;
+        $label = "$i и " . ($i + 15) . " числа каждого месяца";
+      }
+
+      if (!$label) continue;
+
+      $array[$i] = $label;
+    }
+
+    return $array;
+  }
+
+  public function validateLogin() {
+
+    $user = User::model()->findByAttributes([
+      "login" => $this->userLogin,
+    ]);
+
+    if ($user instanceof User) {
+
+      if ($this->userPassword) {
+        if ($user->password == $this->userPassword) {
+          $this->user_id = $user->id;
+        } else {
+
+          $this->addError("userPassword", "Неверный пароль");
+
+        }
+      } else {
+        $this->addError("userPassword", "Логин занят");
+      }
+
+    } else {
+      $user = new User();
+      $user->login = $this->userLogin;
+      $user->password = $this->userPassword;
+      if ($user->save()) {
+        $this->user_id = $user->id;
+      } else {
+        $this->addError("userLogin", $user->getError("login"));
+        $this->addError("userPassword", $user->getError("password"));
+      }
+    }
+
   }
 
 }
