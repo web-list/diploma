@@ -146,4 +146,31 @@ class OrderTest extends CTestCase
     $this->assertFalse($delivered);
   }
 
+
+  public function testWhenDeliveryChangedForTwiceInMonthFromMonthlyThenMakeDelivery15DaysBefore() {
+
+    $order = new Order();
+    $order->deliveryType = Order::DELIVERY_TYPE_MONTHLY;
+    $order->save();
+
+    $searchId = $order->id;
+
+    $order = Order::model()->findByPk($searchId);
+
+    $order->deliveryType = Order::DELIVERY_TYPE_TWICE_A_MONTH;
+    $order->save();
+
+    $time = mktime(
+      date("h"),
+      date("i"),
+      date("s"),
+      date("n"),
+      date("j") + 15,
+      date("Y")
+    );
+
+    $delivered = $order->deliveredInTimestamp($time);
+
+    $this->assertTrue($delivered);
+  }
 }
