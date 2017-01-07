@@ -7,3 +7,7 @@ before_script:
  - php composer-setup.php
  - php composer.phar install
  - php composer.phar update
+
+script:
+ - vendor/bin/yiic migrate
+ - vendor/bin/phpunit --verbose protected/tests/unit
