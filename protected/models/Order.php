@@ -67,7 +67,7 @@ class Order extends CActiveRecord
       ['type, user_id, deliveryDayOfTheMonth', 'numerical', 'integerOnly' => true],
       ['userLogin, userPassword', 'required', 'on' => 'newOrder'],
       ['userLogin', 'validateLogin', 'on' => 'newOrder'],
-      ['deliveryType', 'safe', 'on' => 'newOrder'],
+      ['deliveryType', 'safe'],
       ['id, type, user_id', 'safe', 'on' => 'search'],
     ];
   }

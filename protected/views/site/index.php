@@ -11,17 +11,19 @@ $form = $this->beginWidget("CActiveForm"); ?>
 
 <div class="form p20">
 
-  <div class="row">
-    <?= $form->labelEx($order, "userLogin") ?>
-    <?= $form->textField($order, "userLogin"); ?>
-    <?= $form->error($order, "userLogin"); ?>
-  </div>
+  <?php if (Yii::app()->user->isGuest): ?>
+    <div class="row">
+      <?= $form->labelEx($order, "userLogin") ?>
+      <?= $form->textField($order, "userLogin"); ?>
+      <?= $form->error($order, "userLogin"); ?>
+    </div>
 
-  <div class="row">
-    <?= $form->labelEx($order, "userPassword") ?>
-    <?= $form->passwordField($order, "userPassword"); ?>
-    <?= $form->error($order, "userPassword"); ?>
-  </div>
+    <div class="row">
+      <?= $form->labelEx($order, "userPassword") ?>
+      <?= $form->passwordField($order, "userPassword"); ?>
+      <?= $form->error($order, "userPassword"); ?>
+    </div>
+  <?php endif; ?>
 
   <div class="row">
     <?= $form->labelEx($order, "type") ?>

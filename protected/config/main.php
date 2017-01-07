@@ -33,6 +33,11 @@ return [
     'user' => [
       // enable cookie-based authentication
       'allowAutoLogin' => true,
+      'class' => 'WebUser',
+    ],
+    'authManager' => [
+      'class' => 'PhpAuthManager',
+      'defaultRoles' => ['guest'],
     ],
 
     // uncomment the following to enable URLs in path-format

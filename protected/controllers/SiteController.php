@@ -6,7 +6,8 @@ class SiteController extends Controller
   public $layout = 'main';
 
   public function actionIndex() {
-    $order = new Order("newOrder");
+    $order = new Order(Yii::app()->user->isGuest ? "newOrder" : "create");
+    if (!Yii::app()->user->isGuest) $order->user_id = Yii::app()->user->id;
 
     if ($_POST["Order"]) {
       $order->attributes = $_POST["Order"];
@@ -19,6 +20,16 @@ class SiteController extends Controller
 
     $this->render('index', [
       "order" => $order,
+    ]);
+  }
+
+  public function actionList() {
+    $model = new Order("search");
+    $model->unsetAttributes();
+    $model->user_id = Yii::app()->user->id;
+
+    $this->render("list", [
+      "model" => $model,
     ]);
   }
 

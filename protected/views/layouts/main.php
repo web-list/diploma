@@ -34,6 +34,7 @@ Yii::app()->clientScript->registerCoreScript("jquery");
     <?php $this->widget('zii.widgets.CMenu', [
       'items' => [
         ['label' => 'Заказ', 'url' => ['/site/index']],
+        ['label' => 'Мои заказы', 'url' => ['/site/list'], 'visible' => !Yii::app()->user->isGuest],
         ['label' => 'Войти', 'url' => ['/site/login'], 'visible' => Yii::app()->user->isGuest],
         ['label' => 'Выйти (' . Yii::app()->user->name . ')', 'url' => ['/site/logout'], 'visible' => !Yii::app()->user->isGuest]
       ],
