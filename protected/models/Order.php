@@ -141,7 +141,7 @@ class Order extends CActiveRecord
   public function deliveredInTimestamp($timestamp) {
     if ($this->deliveryType == self::DELIVERY_TYPE_NONE) return false;
 
-    $days = (($timestamp - $this->getStartFrom()) / self::ONE_DAY_SECONDS);
+    $days = round(($timestamp - $this->getStartFrom()) / self::ONE_DAY_SECONDS);
 
     if ($days >= 365) {
       $days -= 365 * floor($days / 365);
