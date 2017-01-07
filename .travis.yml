@@ -4,4 +4,4 @@ rvm:
  - 5.6
 
 script:
- - vendor/bin/phpunit --verbose protected/tests/unit
+ - phpunit --verbose protected/tests/unit
