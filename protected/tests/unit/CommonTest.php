@@ -11,4 +11,19 @@ class CommonTest extends CTestCase
     $this->assertEquals(1, $b);
   }
 
+  public function testDatabaseWorks() {
+    $user = new User;
+    $user->setAttributes([
+      "login" => "test",
+    ]);
+
+    $user->save(false);
+
+    $search = User::model()->findByAttributes([
+      'login' => "test"
+    ]);
+
+    $this->assertTrue($search instanceof User);
+  }
+
 }
