@@ -5,4 +5,4 @@ rvm:
 
 script:
  - cd protected/tests
- - phpunit --verbose protected/tests/unit
+ - phpunit --verbose unit
