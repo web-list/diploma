@@ -8,7 +8,7 @@ return CMap::mergeArray(
         'class' => 'system.test.CDbFixtureManager',
       ],
       'db' => [
-        'connectionString' => 'sqlite:' . dirname(__FILE__) . '/../data/testdrive.db',
+        'connectionString' => 'sqlite:' . dirname(__FILE__) . '/../data/testdrive_test.db',
       ],
     ],
   ]
