@@ -4,4 +4,5 @@ rvm:
  - 5.6
 
 script:
+ - cd protected/tests
  - phpunit --verbose protected/tests/unit
