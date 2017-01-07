@@ -8,7 +8,7 @@ before_script:
  - php composer.phar install
  - php composer.phar update
  - mkdir protected/runtime
- - php protected/yiic migrate
+ - php protected/yiic migrate --interactive=0
 
 script:
  - cd protected/tests
