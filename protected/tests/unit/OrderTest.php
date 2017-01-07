@@ -131,4 +131,19 @@ class OrderTest extends CTestCase
     $this->assertTrue($delivered);
   }
 
+  public function testWhenDeliveryStoppedThenNotMakeDeliveryAfterDeliveryPeriod() {
+
+    $order = new Order();
+    $order->deliveryType = Order::DELIVERY_TYPE_MONTHLY;
+    $order->save();
+
+    $order->stop();
+
+    $time = time() + 30 * Order::ONE_DAY_SECONDS;
+
+    $delivered = $order->deliveredInTimestamp($time);
+
+    $this->assertFalse($delivered);
+  }
+
 }
