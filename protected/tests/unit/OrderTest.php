@@ -85,4 +85,50 @@ class OrderTest extends CTestCase
     $this->assertTrue($delivered);
   }
 
+  public function testWhenMonthlyDeliveryAndEvery7DayChooseThenMakeDelivery7OfTheNextMonth() {
+    $dayOfMonth = 7;
+
+    $order = new Order();
+    $order->deliveryDayOfTheMonth = $dayOfMonth;
+    $order->deliveryType = Order::DELIVERY_TYPE_MONTHLY;
+    $order->save();
+
+    $time = mktime(
+      date("h"),
+      date("i"),
+      date("s"),
+      date("n") + 1,
+      $dayOfMonth,
+      date("Y")
+    );
+
+    $delivered = $order->deliveredInTimestamp($time);
+
+    $this->assertTrue($delivered);
+  }
+
+  public function testWhenTwiceInMonthDeliveryAndEvery9And24DaysChooseThenMakeDelivery24FebruaryInTheNextYear() {
+    $firstDayOfMonth = 9;
+    $lastDayOfMonth = 24;
+    $february = 2;
+
+    $order = new Order();
+    $order->deliveryDayOfTheMonth = $firstDayOfMonth;
+    $order->deliveryType = Order::DELIVERY_TYPE_TWICE_A_MONTH;
+    $order->save();
+
+    $time = mktime(
+      date("h"),
+      date("i"),
+      date("s"),
+      $february,
+      $lastDayOfMonth,
+      date("Y") + 1
+    );
+
+    $delivered = $order->deliveredInTimestamp($time);
+
+    $this->assertTrue($delivered);
+  }
+
 }

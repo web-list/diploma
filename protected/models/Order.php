@@ -10,13 +10,15 @@
  * @property integer $user_id
  * @property integer $delivery_interval
  * @property integer $created
+ * @property integer $delivery_started
  */
 class Order extends CActiveRecord
 {
 
   public $deliveryType;
+  public $deliveryDayOfTheMonth;
 
-  const ONE_DAY_SECONDS = 60 * 60 * 24;
+  const ONE_DAY_SECONDS = 86400; // 60 * 60 * 24
 
   const TYPE_ONE_SHAVER_SET = 0;
   const TYPE_WITH_GEL_SET = 1;
@@ -98,7 +100,22 @@ class Order extends CActiveRecord
   }
 
   public function beforeSave() {
-    $this->created = time();
+
+    if ($this->isNewRecord) {
+      $this->created = time();
+
+      if ($this->deliveryDayOfTheMonth) {
+        $this->delivery_started = mktime(
+          date("h"),
+          date("i"),
+          date("s"),
+          date("n") + 1,
+          $this->deliveryDayOfTheMonth,
+          date("Y")
+        );
+      }
+    }
+
     $this->delivery_interval = self::$deliveryTypeIntervals[$this->deliveryType];
 
     return parent::beforeSave();
@@ -116,7 +133,14 @@ class Order extends CActiveRecord
   }
 
   public function deliveredInTimestamp($timestamp) {
-    $mod = (($timestamp - $this->created) / self::ONE_DAY_SECONDS) % $this->delivery_interval;
+    $startFrom = $this->delivery_started ?: $this->created;
+    $days = (($timestamp - $startFrom) / self::ONE_DAY_SECONDS);
+
+    if ($days >= 365) {
+      $days -= 365 * floor($days / 365);
+    }
+
+    $mod = $days % $this->delivery_interval;
 
     return $mod === 0;
   }
