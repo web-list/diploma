@@ -135,8 +135,7 @@ class Order extends CActiveRecord
   public function deliveredInTimestamp($timestamp) {
     if ($this->deliveryType == self::DELIVERY_TYPE_NONE) return false;
 
-    $startFrom = $this->delivery_started ?: $this->created;
-    $days = (($timestamp - $startFrom) / self::ONE_DAY_SECONDS);
+    $days = (($timestamp - $this->getStartFrom()) / self::ONE_DAY_SECONDS);
 
     if ($days >= 365) {
       $days -= 365 * floor($days / 365);
@@ -150,6 +149,10 @@ class Order extends CActiveRecord
   public function stop() {
     $this->deliveryType = self::DELIVERY_TYPE_NONE;
     $this->save(false);
+  }
+
+  public function getStartFrom() {
+    return $this->delivery_started ?: $this->created;
   }
 
 }

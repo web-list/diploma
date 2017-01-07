@@ -8,6 +8,8 @@
  * @property integer $id
  * @property string $login
  * @property string $password
+ *
+ * @property Order[] $orders
  */
 class User extends CActiveRecord
 {
@@ -25,6 +27,7 @@ class User extends CActiveRecord
 
   public function relations() {
     return [
+      'orders' => [self::HAS_MANY, "Order", "user_id"],
     ];
   }
 
@@ -51,4 +54,19 @@ class User extends CActiveRecord
   public static function model($className = __CLASS__) {
     return parent::model($className);
   }
+
+  public function getTotalSpent($timestamp) {
+
+    $spent = 0;
+    if ($this->orders) foreach ($this->orders as $order) {
+
+      $periodCount = floor((($timestamp - $order->getStartFrom()) / Order::ONE_DAY_SECONDS) / $order->delivery_interval);
+      $orderSpent = $periodCount * Order::$typePrices[$order->type];
+
+      $spent += $orderSpent;
+    }
+
+    return $spent;
+  }
+
 }
