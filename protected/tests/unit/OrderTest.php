@@ -30,34 +30,39 @@ class OrderTest extends CTestCase
     $this->assertEquals(19, $price);
   }
 
-  public function testWhenOneInTwoMonthsDeliveryChooseThenMakeDeliveryAfter60Days() {
+  public function testWhenOneInTwoMonthsDeliveryChooseThenMakeDeliveryAfterTwoMonths() {
     $order = new Order();
-    $order->deliveryType = Order::DELIVERY_TYPE_ONCE_IN_TWO_MONTHS;
+    $order->delivery_type = Order::DELIVERY_TYPE_ONCE_IN_TWO_MONTHS;
     $order->save();
 
-    $time = time() + 60 * 60 * 24 * 60;
+    $time = $order->created;
+    $time = strtotime("+2 month", $time);
     $delivered = $order->deliveredInTimestamp($time);
 
     $this->assertTrue($delivered);
   }
 
-  public function testWhenMonthlyDeliveryChooseThenMakeDeliveryAfter30Days() {
+  public function testWhenMonthlyDeliveryChooseThenMakeDeliveryAfterOneMonth() {
     $order = new Order();
-    $order->deliveryType = Order::DELIVERY_TYPE_MONTHLY;
+    $order->delivery_type = Order::DELIVERY_TYPE_MONTHLY;
     $order->save();
 
-    $time = time() + 60 * 60 * 24 * 30;
+    $time = $order->created;
+    $time = strtotime("+1 month", $time);
+
     $delivered = $order->deliveredInTimestamp($time);
 
     $this->assertTrue($delivered);
   }
 
-  public function testWhenMonthlyDeliveryChooseThenMakeDeliveryAfter90Days() {
+  public function testWhenMonthlyDeliveryChooseThenMakeDeliveryAfter3Months() {
     $order = new Order();
-    $order->deliveryType = Order::DELIVERY_TYPE_MONTHLY;
+    $order->delivery_type = Order::DELIVERY_TYPE_MONTHLY;
     $order->save();
 
-    $time = time() + 60 * 60 * 24 * 90;
+    $time = $order->created;
+    $time = strtotime("+3 month", $time);
+
     $delivered = $order->deliveredInTimestamp($time);
 
     $this->assertTrue($delivered);
@@ -65,21 +70,27 @@ class OrderTest extends CTestCase
 
   public function testWhenTwiceInMonthDeliveryChooseThenMakeDeliveryAfter15Days() {
     $order = new Order();
-    $order->deliveryType = Order::DELIVERY_TYPE_TWICE_A_MONTH;
+    $order->delivery_type = Order::DELIVERY_TYPE_TWICE_A_MONTH;
     $order->save();
 
-    $time = time() + 60 * 60 * 24 * 15;
+    $time = $order->created;
+
+    $time = strtotime("+15 day", $time);
+
     $delivered = $order->deliveredInTimestamp($time);
 
     $this->assertTrue($delivered);
   }
 
-  public function testWhenTwiceInMonthDeliveryChooseThenMakeDeliveryAfter75Days() {
+  public function testWhenTwiceInMonthDeliveryChooseThenMakeDeliveryAfter2MonthsAnd15Days() {
     $order = new Order();
-    $order->deliveryType = Order::DELIVERY_TYPE_TWICE_A_MONTH;
+    $order->delivery_type = Order::DELIVERY_TYPE_TWICE_A_MONTH;
     $order->save();
 
-    $time = time() + 60 * 60 * 24 * 75;
+    $time = $order->created;
+    $time = strtotime("+2 month", $time);
+    $time = strtotime("+15 day", $time);
+
     $delivered = $order->deliveredInTimestamp($time);
 
     $this->assertTrue($delivered);
@@ -90,17 +101,11 @@ class OrderTest extends CTestCase
 
     $order = new Order();
     $order->deliveryDayOfTheMonth = $dayOfMonth;
-    $order->deliveryType = Order::DELIVERY_TYPE_MONTHLY;
+    $order->delivery_type = Order::DELIVERY_TYPE_MONTHLY;
     $order->save();
 
-    $time = mktime(
-      date("h"),
-      date("i"),
-      date("s"),
-      date("n") + 1,
-      date("j"),
-      date("Y")
-    );
+    $time = $order->delivery_started;
+    $time = strtotime("+1 month", $time);
 
     $delivered = $order->deliveredInTimestamp($time);
 
@@ -114,16 +119,17 @@ class OrderTest extends CTestCase
 
     $order = new Order();
     $order->deliveryDayOfTheMonth = $firstDayOfMonth;
-    $order->deliveryType = Order::DELIVERY_TYPE_TWICE_A_MONTH;
+    $order->delivery_type = Order::DELIVERY_TYPE_TWICE_A_MONTH;
     $order->save();
 
+    $time = $order->delivery_started;
     $time = mktime(
-      date("h"),
-      date("i"),
-      date("s"),
+      date("h", $time),
+      date("i", $time),
+      date("s", $time),
       $february,
       $lastDayOfMonth,
-      date("Y") + 1
+      date("Y", $time) + 1
     );
 
     $delivered = $order->deliveredInTimestamp($time);
@@ -134,7 +140,7 @@ class OrderTest extends CTestCase
   public function testWhenDeliveryStoppedThenNotMakeDeliveryAfterDeliveryPeriod() {
 
     $order = new Order();
-    $order->deliveryType = Order::DELIVERY_TYPE_MONTHLY;
+    $order->delivery_type = Order::DELIVERY_TYPE_MONTHLY;
     $order->save();
 
     $order->stop();
@@ -146,28 +152,22 @@ class OrderTest extends CTestCase
     $this->assertFalse($delivered);
   }
 
-
   public function testWhenDeliveryChangedForTwiceInMonthFromMonthlyThenMakeDelivery15DaysBefore() {
 
     $order = new Order();
-    $order->deliveryType = Order::DELIVERY_TYPE_MONTHLY;
+    $order->delivery_type = Order::DELIVERY_TYPE_MONTHLY;
     $order->save();
 
     $searchId = $order->id;
 
+    /** @var Order $order */
     $order = Order::model()->findByPk($searchId);
 
-    $order->deliveryType = Order::DELIVERY_TYPE_TWICE_A_MONTH;
+    $order->delivery_type = Order::DELIVERY_TYPE_TWICE_A_MONTH;
     $order->save();
 
-    $time = mktime(
-      date("h"),
-      date("i"),
-      date("s"),
-      date("n"),
-      date("j") + 15,
-      date("Y")
-    );
+    $time = $order->getStartFrom();
+    $time = strtotime("+15 days", $time);
 
     $delivered = $order->deliveredInTimestamp($time);
 

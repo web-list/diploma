@@ -10,18 +10,12 @@ class UserTest extends CTestCase
 
     $order = new Order();
     $order->user_id = $user->id;
-    $order->deliveryType = Order::DELIVERY_TYPE_MONTHLY;
+    $order->delivery_type = Order::DELIVERY_TYPE_MONTHLY;
     $order->type = Order::TYPE_WITH_GEL_SET;
     $order->save();
 
-    $time = mktime(
-      date("h"),
-      date("i"),
-      date("s"),
-      date("n") + 3,
-      date("j"),
-      date("Y")
-    );
+    $time = $order->getStartFrom();
+    $time = strtotime("+3 month", $time);
 
     $spent = $user->getTotalSpent($time);
 
@@ -36,18 +30,12 @@ class UserTest extends CTestCase
 
     $order = new Order();
     $order->user_id = $user->id;
-    $order->deliveryType = Order::DELIVERY_TYPE_TWICE_A_MONTH;
+    $order->delivery_type = Order::DELIVERY_TYPE_TWICE_A_MONTH;
     $order->type = Order::TYPE_FULL_SET;
     $order->save();
 
-    $time = mktime(
-      date("h"),
-      date("i"),
-      date("s"),
-      date("n"),
-      date("j"),
-      date("Y") + 1
-    );
+    $time = $order->getStartFrom();
+    $time = strtotime("+1 year", $time);
 
     $spent = $user->getTotalSpent($time);
 
@@ -64,17 +52,11 @@ class UserTest extends CTestCase
     $order = new Order();
     $order->user_id = $user->id;
     $order->type = Order::TYPE_WITH_GEL_SET;
-    $order->deliveryType = Order::DELIVERY_TYPE_MONTHLY;
+    $order->delivery_type = Order::DELIVERY_TYPE_MONTHLY;
     $order->save();
 
-    $time = mktime(
-      date("h"),
-      date("i"),
-      date("s"),
-      date("n") + 1,
-      date("j"),
-      date("Y")
-    );
+    $time = $order->getStartFrom();
+    $time = strtotime("+1 month", $time);
 
     $defaultSpent = $user->getTotalSpent($time);
 

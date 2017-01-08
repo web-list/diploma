@@ -8,7 +8,7 @@
  * @property integer $id
  * @property integer $type
  * @property integer $user_id
- * @property integer $delivery_interval
+ * @property integer $delivery_type
  * @property integer $created
  * @property integer $delivery_started
  *
@@ -20,7 +20,6 @@ class Order extends CActiveRecord
   public $userLogin;
   public $userPassword;
 
-  public $deliveryType;
   public $deliveryDayOfTheMonth;
 
   const ONE_DAY_SECONDS = 86400; // 60 * 60 * 24
@@ -69,7 +68,7 @@ class Order extends CActiveRecord
       ['type, user_id, deliveryDayOfTheMonth', 'numerical', 'integerOnly' => true],
       ['userLogin, userPassword', 'required', 'on' => 'newOrder'],
       ['userLogin', 'validateLogin', 'on' => 'newOrder'],
-      ['deliveryType', 'safe'],
+      ['delivery_type', 'length', 'max' => 32],
       ['id, type, user_id', 'safe', 'on' => 'search'],
     ];
   }
@@ -83,8 +82,9 @@ class Order extends CActiveRecord
   public function attributeLabels() {
     return [
       'id' => 'ID',
-      'type' => 'Type',
-      'user_id' => 'User',
+      'type' => 'Вариант заказа',
+      'delivery_type' => 'Доставка',
+      'user_id' => 'Пользователь',
     ];
   }
 
@@ -125,38 +125,58 @@ class Order extends CActiveRecord
       }
     }
 
-    $this->delivery_interval = self::$deliveryTypeIntervals[$this->deliveryType];
-
     return parent::beforeSave();
   }
 
-  public function afterFind() {
-
-    foreach (self::$deliveryTypeIntervals as $type => $interval) {
-      if ($interval == $this->delivery_interval) {
-        $this->deliveryType = $type;
+  public function previousDelivery($time) {
+    if ($this->delivery_type == self::DELIVERY_TYPE_ONCE_IN_TWO_MONTHS) {
+      return strtotime("-2 month", $time);
+    } elseif ($this->delivery_type == self::DELIVERY_TYPE_MONTHLY) {
+      return strtotime("-1 month", $time);
+    } elseif ($this->delivery_type == self::DELIVERY_TYPE_TWICE_A_MONTH) {
+      $day = date("j", $time);
+      if ($day > 15) {
+        return strtotime("-15 days", $time);
+      } else {
+        $time = strtotime("-1 month", $time);
+        return strtotime("+15 days", $time);
       }
+    } else {
+      return $this->created;
     }
 
-    return parent::afterFind();
+  }
+
+  public function periodElapsed($time = null) {
+    if (!$time) $time = time();
+
+    $firstTime = $this->getStartFrom();
+
+    $count = 0;
+    while ($time > $firstTime) {
+      $time = $this->previousDelivery($time);
+      $count++;
+    }
+
+    return $count;
   }
 
   public function deliveredInTimestamp($timestamp) {
-    if ($this->deliveryType == self::DELIVERY_TYPE_NONE) return false;
+    if ($this->delivery_type == self::DELIVERY_TYPE_NONE) return false;
 
-    $days = round(($timestamp - $this->getStartFrom()) / self::ONE_DAY_SECONDS);
+    $firstTime = $this->getStartFrom();
+    $time = $timestamp;
 
-    if ($days >= 365) {
-      $days -= 365 * floor($days / 365);
+    while ($time > $firstTime) {
+      $time = $this->previousDelivery($time);
     }
 
-    $mod = $days % $this->delivery_interval;
+    return $time == $firstTime;
 
-    return $mod === 0;
   }
 
   public function stop() {
-    $this->deliveryType = self::DELIVERY_TYPE_NONE;
+    $this->delivery_type = self::DELIVERY_TYPE_NONE;
     $this->save(false);
   }
 

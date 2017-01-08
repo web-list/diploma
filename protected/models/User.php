@@ -61,7 +61,7 @@ class User extends CActiveRecord
     $spent = 0;
     if ($this->orders) foreach ($this->orders as $order) {
 
-      $periodCount = $order->delivery_interval ? round((($timestamp - $order->getStartFrom()) / Order::ONE_DAY_SECONDS) / $order->delivery_interval) : 0;
+      $periodCount = $order->periodElapsed($timestamp);
       $orderSpent = $periodCount * Order::$typePrices[$order->type];
 
       $spent += $orderSpent;
