@@ -49,7 +49,7 @@ $form = $this->beginWidget("CActiveForm"); ?>
 
 
   <div class="row">
-    <?= CHtml::submitButton("Оформить заказ"); ?>
+    <?= CHtml::submitButton($order->isNewRecord ? "Оформить заказ" : "Сохранить"); ?>
   </div>
 
 </div>

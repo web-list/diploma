@@ -65,10 +65,11 @@ class Order extends CActiveRecord
 
   public function rules() {
     return [
-      ['type, user_id, deliveryDayOfTheMonth', 'numerical', 'integerOnly' => true],
+      ['type, user_id', 'numerical', 'integerOnly' => true],
       ['userLogin, userPassword', 'required', 'on' => 'newOrder'],
       ['userLogin', 'validateLogin', 'on' => 'newOrder'],
       ['delivery_type', 'length', 'max' => 32],
+      ['deliveryDayOfTheMonth', 'safe'],
       ['id, type, user_id', 'safe', 'on' => 'search'],
     ];
   }
@@ -89,6 +90,7 @@ class Order extends CActiveRecord
       'userLogin' => 'Логин',
       'userPassword' => 'Пароль',
       'deliveryDayOfTheMonth' => 'Дата доставки',
+      'dayLabel' => 'Дата доставки',
     ];
   }
 
@@ -116,20 +118,30 @@ class Order extends CActiveRecord
 
     if ($this->isNewRecord) {
       $this->created = time();
+    }
 
-      if ($this->deliveryDayOfTheMonth) {
-        $this->delivery_started = mktime(
-          date("h", $this->created),
-          date("i", $this->created),
-          date("s", $this->created),
-          date("n", $this->created),
-          $this->deliveryDayOfTheMonth,
-          date("Y", $this->created)
-        );
-      }
+    if ($this->deliveryDayOfTheMonth) {
+      $this->delivery_started = mktime(
+        date("h", $this->created),
+        date("i", $this->created),
+        date("s", $this->created),
+        date("n", $this->created),
+        $this->deliveryDayOfTheMonth,
+        date("Y", $this->created)
+      );
     }
 
     return parent::beforeSave();
+  }
+
+
+  public function afterFind() {
+
+    if ($this->delivery_started) {
+      $this->deliveryDayOfTheMonth = date("j", $this->delivery_started);
+    }
+
+    return parent::afterFind();
   }
 
   public function previousDelivery($time) {
@@ -189,23 +201,32 @@ class Order extends CActiveRecord
     return $this->delivery_started ?: $this->created;
   }
 
+  public static function getLabelByType($i, $deliveryType, $full = false) {
+    $label = null;
+
+    if ($deliveryType == self::DELIVERY_TYPE_ONCE_IN_TWO_MONTHS) {
+      $label = "$i числа каждого второго месяца";
+    }
+    if ($deliveryType == self::DELIVERY_TYPE_MONTHLY) {
+      $label = "$i числа каждого месяца";
+    }
+    if ($deliveryType == self::DELIVERY_TYPE_TWICE_A_MONTH) {
+      if ($i <= 15)
+        $label = "$i и " . ($i + 15) . " числа каждого месяца";
+      if ($i > 15 && $full) {
+        $label = ($i - 15) . " и $i числа каждого месяца";
+      }
+    }
+
+    return $label;
+  }
+
   public static function getDeliveryDayOfMonth($deliveryType) {
     $array = [];
 
     for ($i = 0; $i++ < 30;) {
 
-      $label = null;
-
-      if ($deliveryType == self::DELIVERY_TYPE_ONCE_IN_TWO_MONTHS) {
-        $label = "$i числа каждого второго месяца";
-      }
-      if ($deliveryType == self::DELIVERY_TYPE_MONTHLY) {
-        $label = "$i числа каждого месяца";
-      }
-      if ($deliveryType == self::DELIVERY_TYPE_TWICE_A_MONTH) {
-        if ($i > 15) continue;
-        $label = "$i и " . ($i + 15) . " числа каждого месяца";
-      }
+      $label = self::getLabelByType($i, $deliveryType);
 
       if (!$label) continue;
 
@@ -247,6 +268,11 @@ class Order extends CActiveRecord
       }
     }
 
+  }
+
+  public function getDayLabel() {
+    if (!$this->deliveryDayOfTheMonth) return null;
+    return self::getLabelByType($this->deliveryDayOfTheMonth, $this->delivery_type, true);
   }
 
 }

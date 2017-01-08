@@ -18,7 +18,7 @@ class SiteController extends Controller
       ],
       [
         'allow',
-        "actions" => ["list", "logout"],
+        "actions" => ["list", "logout", "stop", "update"],
         "users" => ["@"],
       ],
       [
@@ -101,4 +101,34 @@ class SiteController extends Controller
     $this->redirect(Yii::app()->homeUrl);
   }
 
+  public function actionStop($id) {
+    $model = $this->loadModel($id);
+    $model->stop();
+    $this->redirect(["list"]);
+  }
+
+  public function actionUpdate($id) {
+    $model = $this->loadModel($id);
+
+    if ($_POST["Order"]) {
+      $model->attributes = $_POST["Order"];
+
+      if ($model->save()) {
+        $this->redirect(["list"]);
+      }
+
+    }
+    $this->render("index", ["order" => $model]);
+  }
+
+  /**
+   * @param $id
+   * @return Order
+   * @throws CHttpException
+   */
+  private function loadModel($id) {
+    $model = Order::model()->findByPk($id);
+    if (!$model instanceof Order) throw new CHttpException(404);
+    return $model;
+  }
 }
