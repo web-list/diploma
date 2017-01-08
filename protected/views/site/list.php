@@ -7,10 +7,21 @@
 
 /** @var User $user */
 $user = Yii::app()->user->getModel();
-
 $this->widget("zii.widgets.grid.CGridView", [
   "dataProvider" => $model->search(),
   "columns" => [
+    [
+      'name' => 'created',
+      'value' => function ($model) {
+        return date("h:i:s d.m.Y", $model->created);
+      }
+    ],
+    [
+      'name' => 'delivery_started',
+      'value' => function ($model) {
+        return date("h:i:s d.m.Y", $model->delivery_started);
+      }
+    ],
     [
       "name" => "type",
       "value" => function ($model) {
@@ -42,6 +53,6 @@ $this->widget("zii.widgets.grid.CGridView", [
 ?>
 
 <?php if ($user instanceof User): ?>
-  <!--<h2>Потрачено средств на --><? //= date("h:i:s d.m.Y", $time); ?><!--: <strong>$--><? //= $user->getTotalSpent($time); ?><!--</strong>-->
-  <!--</h2>-->
+  <h2>Потрачено средств на <?= date("h:i:s d.m.Y", $time); ?>: <strong>$<?= $user->getTotalSpent($time); ?></strong>
+  </h2>
 <?php endif; ?>

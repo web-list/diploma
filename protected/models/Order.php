@@ -91,6 +91,8 @@ class Order extends CActiveRecord
       'userPassword' => 'Пароль',
       'deliveryDayOfTheMonth' => 'Дата доставки',
       'dayLabel' => 'Дата доставки',
+      'created' => 'Дата оформления',
+      'delivery_started' => 'Дата первой доставки',
     ];
   }
 
@@ -129,6 +131,10 @@ class Order extends CActiveRecord
         $this->deliveryDayOfTheMonth,
         date("Y", $this->created)
       );
+
+      if ($this->delivery_started < $this->created) {
+        $this->delivery_started = $this->nextDelivery($this->delivery_started);
+      }
     }
 
     return parent::beforeSave();
@@ -142,6 +148,23 @@ class Order extends CActiveRecord
     }
 
     return parent::afterFind();
+  }
+
+  public function nextDelivery($time) {
+    if ($this->delivery_type == self::DELIVERY_TYPE_ONCE_IN_TWO_MONTHS) {
+      return strtotime("+2 month", $time);
+    } elseif ($this->delivery_type == self::DELIVERY_TYPE_MONTHLY) {
+      return strtotime("+1 month", $time);
+    } elseif ($this->delivery_type == self::DELIVERY_TYPE_TWICE_A_MONTH) {
+      $day = date("j", $time);
+      if ($day <= 15) {
+        return strtotime("+15 days", $time);
+      } else {
+        return strtotime("-15 days", $time);
+      }
+    } else {
+      return $this->created;
+    }
   }
 
   public function previousDelivery($time) {
@@ -167,6 +190,9 @@ class Order extends CActiveRecord
     if (!$time) $time = time();
 
     $firstTime = $this->getStartFrom();
+
+    if ($time < $firstTime) return 0;
+    if ($this->delivery_type == self::DELIVERY_TYPE_NONE) return 1;
 
     $count = 0;
     while ($time > $firstTime) {
