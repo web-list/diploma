@@ -52,7 +52,33 @@ $this->widget("zii.widgets.grid.CGridView", [
 ]);
 ?>
 
-<?php if ($user instanceof User): ?>
-  <h2>Потрачено средств на <?= date("h:i:s d.m.Y", $time); ?>: <strong>$<?= $user->getTotalSpent($time); ?></strong>
-  </h2>
-<?php endif; ?>
+<hr>
+
+<div class="p20">
+
+  <h2>Отчет:</h2>
+
+  <form style="margin-bottom: 20px;">
+    <div class="row">
+      <input type="hidden" name="r" value="site/list">
+      <input type="text" name="time" value="<?= date("h:i d.m.Y", $time); ?>">
+      <input type="submit" value="Посчитать">
+    </div>
+  </form>
+
+  <?php if ($user instanceof User): ?>
+    <h3>Потрачено средств на <?= date("h:i:s d.m.Y", $time); ?>: <strong>$<?= $user->getTotalSpent($time); ?></strong>
+    </h3>
+  <?php endif; ?>
+
+  <script>
+    $(document).ready(function () {
+      $.noConflict();
+      $("[name=time]").datetimepicker({
+        format: "H:i d.m.Y"
+      });
+    });
+  </script>
+
+
+</div>

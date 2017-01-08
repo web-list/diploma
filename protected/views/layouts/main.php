@@ -1,13 +1,16 @@
 <?php /* @var $this Controller */
 
-Yii::app()->clientScript->registerCoreScript("jquery");
-
 ?>
 <!DOCTYPE html>
 <html>
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
   <meta name="language" content="en">
+
+  <link rel="stylesheet" href="<?= Yii::app()->request->baseUrl . "/plugins/datetime/jquery.datetimepicker.min.css" ?>">
+
+  <script type="text/javascript" src="https://yastatic.net/jquery/3.1.0/jquery.min.js"></script>
+  <script type="text/javascript" src="<?= Yii::app()->request->baseUrl . "/plugins/datetime/jquery.datetimepicker.full.min.js"  ?>"></script>
 
   <!-- blueprint CSS framework -->
   <link rel="stylesheet" type="text/css" href="<?php echo Yii::app()->request->baseUrl; ?>/css/screen.css" media="screen, projection">
