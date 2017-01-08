@@ -31,8 +31,8 @@ $form = $this->beginWidget("CActiveForm"); ?>
   </div>
 
   <div class="row">
-    <?= $form->labelEx($order, "deliveryType") ?>
-    <?= $form->dropDownList($order, "deliveryType", Order::$deliveryTypeTitles); ?>
+    <?= $form->labelEx($order, "delivery_type") ?>
+    <?= $form->dropDownList($order, "delivery_type", Order::$deliveryTypeTitles); ?>
   </div>
 
   <?php foreach (Order::$deliveryTypeTitles as $type => $title): ?>
@@ -60,13 +60,13 @@ $form = $this->beginWidget("CActiveForm"); ?>
   var toggleDeliveryDayField = function () {
     $(".js-day").hide();
 
-    var type = $("#Order_deliveryType").val();
+    var type = $("#Order_delivery_type").val();
 
     $(".js-day[data-type='" + type + "']").show();
 
   };
 
-  $("#Order_deliveryType").on("change", toggleDeliveryDayField);
+  $("#Order_delivery_type").on("change", toggleDeliveryDayField);
   toggleDeliveryDayField();
 
 </script>

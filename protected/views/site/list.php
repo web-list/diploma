@@ -5,6 +5,9 @@
  * @var $time integer
  */
 
+/** @var User $user */
+$user = Yii::app()->user->getModel();
+
 $this->widget("zii.widgets.grid.CGridView", [
   "dataProvider" => $model->search(),
   "columns" => [
@@ -16,11 +19,16 @@ $this->widget("zii.widgets.grid.CGridView", [
     ],
     "price",
     [
-      "name" => "deliveryType",
+      "name" => "delivery_type",
       "value" => function ($model) {
-        return Order::$deliveryTypeTitles[$model->deliveryType];
+        return Order::$deliveryTypeTitles[$model->delivery_type];
       }
     ]
   ]
-])
+]);
 ?>
+
+<?php if ($user instanceof User): ?>
+  <!--<h2>Потрачено средств на --><?//= date("h:i:s d.m.Y", $time); ?><!--: <strong>$--><?//= $user->getTotalSpent($time); ?><!--</strong>-->
+  <!--</h2>-->
+<?php endif; ?>

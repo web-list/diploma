@@ -3,6 +3,31 @@
 class SiteController extends Controller
 {
 
+  public function filters() {
+    return [
+      'accessControl', // perform access control for CRUD operations
+    ];
+  }
+
+  public function accessRules() {
+    return [
+      [
+        'allow',
+        'actions' => ["index", "error", "login"],
+        "users" => ["*"],
+      ],
+      [
+        'allow',
+        "actions" => ["list", "logout"],
+        "users" => ["@"],
+      ],
+      [
+        "deny",
+        "users" => ["*"],
+      ]
+    ];
+  }
+
   public $layout = 'main';
 
   public function actionIndex() {
@@ -13,7 +38,13 @@ class SiteController extends Controller
       $order->attributes = $_POST["Order"];
 
       if ($order->save()) {
-        $this->redirect(["success", "orderId" => $order->id]);
+        if (Yii::app()->user->isGuest && $order->user_id) {
+          $form = new LoginForm();
+          $form->username = $order->user->login;
+          $form->password = $order->user->password;
+          $form->login();
+        }
+        $this->redirect(["list"]);
       }
 
     }
@@ -24,7 +55,11 @@ class SiteController extends Controller
   }
 
   public function actionList($time = null) {
-    if (!$time) $time = time();
+    if (!$time) {
+      $time = time();
+    } else {
+      $time = strtotime($time);
+    }
 
     $model = new Order("search");
     $model->unsetAttributes();
@@ -64,14 +99,6 @@ class SiteController extends Controller
   public function actionLogout() {
     Yii::app()->user->logout();
     $this->redirect(Yii::app()->homeUrl);
-  }
-
-  public function actionSuccess($orderId) {
-    $order = Order::model()->findByPk($orderId);
-
-    $this->render("success", [
-      "order" => $order,
-    ]);
   }
 
 }

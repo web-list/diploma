@@ -85,6 +85,10 @@ class Order extends CActiveRecord
       'type' => 'Вариант заказа',
       'delivery_type' => 'Доставка',
       'user_id' => 'Пользователь',
+      'price' => 'Стоимость',
+      'userLogin' => 'Логин',
+      'userPassword' => 'Пароль',
+      'deliveryDayOfTheMonth' => 'Дата доставки',
     ];
   }
 
@@ -115,12 +119,12 @@ class Order extends CActiveRecord
 
       if ($this->deliveryDayOfTheMonth) {
         $this->delivery_started = mktime(
-          date("h"),
-          date("i"),
-          date("s"),
-          date("n") + 1,
+          date("h", $this->created),
+          date("i", $this->created),
+          date("s", $this->created),
+          date("n", $this->created),
           $this->deliveryDayOfTheMonth,
-          date("Y")
+          date("Y", $this->created)
         );
       }
     }
@@ -157,6 +161,7 @@ class Order extends CActiveRecord
       $time = $this->previousDelivery($time);
       $count++;
     }
+    $count = $count ?: 1;
 
     return $count;
   }

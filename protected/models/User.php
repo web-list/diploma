@@ -56,7 +56,8 @@ class User extends CActiveRecord
     return parent::model($className);
   }
 
-  public function getTotalSpent($timestamp) {
+  public function getTotalSpent($timestamp = null) {
+    if (!$timestamp) $timestamp = time();
 
     $spent = 0;
     if ($this->orders) foreach ($this->orders as $order) {
