@@ -98,7 +98,7 @@ class OrderTest extends CTestCase
       date("i"),
       date("s"),
       date("n") + 1,
-      $dayOfMonth,
+      date("j"),
       date("Y")
     );
 

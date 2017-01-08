@@ -2,6 +2,7 @@
 /**
  * @var $this SiteController
  * @var $model Order
+ * @var $time integer
  */
 
 $this->widget("zii.widgets.grid.CGridView", [

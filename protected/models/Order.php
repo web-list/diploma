@@ -11,6 +11,8 @@
  * @property integer $delivery_interval
  * @property integer $created
  * @property integer $delivery_started
+ *
+ * @property User $user
  */
 class Order extends CActiveRecord
 {
@@ -74,6 +76,7 @@ class Order extends CActiveRecord
 
   public function relations() {
     return [
+      'user' => [self::BELONGS_TO, "User", "user_id"],
     ];
   }
 

@@ -23,13 +23,16 @@ class SiteController extends Controller
     ]);
   }
 
-  public function actionList() {
+  public function actionList($time = null) {
+    if (!$time) $time = time();
+
     $model = new Order("search");
     $model->unsetAttributes();
     $model->user_id = Yii::app()->user->id;
 
     $this->render("list", [
       "model" => $model,
+      "time" => $time,
     ]);
   }
 
