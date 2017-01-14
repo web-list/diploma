@@ -8,40 +8,30 @@ class UserTest extends CTestCase
     $user = new User();
     $user->save();
 
-    $order = new Order();
-    $order->user_id = $user->id;
-    $order->delivery_type = Order::DELIVERY_TYPE_MONTHLY;
-    $order->type = Order::TYPE_WITH_GEL_SET;
-    $order->save();
+    $order = OrderBuild::construct()
+      ->byUser($user)
+      ->withMonthlyDelivery()
+      ->setProductWithGelSet()
+      ->build();
 
-    $time = $order->getStartFrom();
-    $time = strtotime("+3 month", $time);
+    $spent = $user->getTotalSpent($order->getTimeAfter("+3 month"));
 
-    $spent = $user->getTotalSpent($time);
-
-    $expectedPrice = 9 * 3;
-
-    $this->assertEquals($expectedPrice, $spent);
+    $this->assertEquals(9 * 3, $spent);
   }
 
   public function testWhenUserChooseFullSetAndTwiceInMonthDeliveryThenAfterYearSpent456Dollars() {
     $user = new User();
     $user->save();
 
-    $order = new Order();
-    $order->user_id = $user->id;
-    $order->delivery_type = Order::DELIVERY_TYPE_TWICE_A_MONTH;
-    $order->type = Order::TYPE_FULL_SET;
-    $order->save();
+    $order = OrderBuild::construct()
+      ->byUser($user)
+      ->withTwiceInMonthDelivery()
+      ->setProductFullSet()
+      ->build();
 
-    $time = $order->getStartFrom();
-    $time = strtotime("+1 year", $time);
+    $spent = $user->getTotalSpent($order->getTimeAfter("+1 year"));
 
-    $spent = $user->getTotalSpent($time);
-
-    $expectedPrice = 19 * 12 * 2;
-
-    $this->assertEquals($expectedPrice, $spent);
+    $this->assertEquals(19 * 12 * 2, $spent);
   }
 
   public function testWhenSetChangedForFullFromWithGelThenTotalSpentAfterMonthMoreThan10Dollars() {
