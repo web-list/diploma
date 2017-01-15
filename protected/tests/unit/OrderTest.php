@@ -82,20 +82,6 @@ class OrderTest extends CTestCase
     $this->assertTrue($delivered);
   }
 
-  public function testWhenTwiceInMonthDeliveryChooseThenMakeDeliveryAfter2MonthsAnd15Days() {
-    $order = new Order();
-    $order->delivery_type = Order::DELIVERY_TYPE_TWICE_A_MONTH;
-    $order->save();
-
-    $time = $order->created;
-    $time = strtotime("+2 month", $time);
-    $time = strtotime("+15 day", $time);
-
-    $delivered = $order->deliveredInTimestamp($time);
-
-    $this->assertTrue($delivered);
-  }
-
   public function testWhenMonthlyDeliveryAndEvery7DayChooseThenMakeDelivery7OfTheNextMonth() {
     $dayOfMonth = 7;
 
