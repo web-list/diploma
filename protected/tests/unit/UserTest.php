@@ -39,32 +39,23 @@ class UserTest extends CTestCase
     $user = new User();
     $user->save();
 
-    $order = new Order();
-    $order->user_id = $user->id;
-    $order->type = Order::TYPE_WITH_GEL_SET;
-    $order->delivery_type = Order::DELIVERY_TYPE_MONTHLY;
-    $order->save();
+    $order = OrderBuild::construct()
+      ->byUser($user)
+      ->withMonthlyDelivery()
+      ->setProductWithGelSet()
+      ->build();
 
-    $time = $order->getStartFrom();
-    $time = strtotime("+1 month", $time);
-
+    $time = $order->getTimeAfter("+1 month");
     $defaultSpent = $user->getTotalSpent($time);
 
-    $orderId = $order->id;
-
-    $order = Order::model()->findByPk($orderId);
-
+    $order->refresh();
     $order->type = Order::TYPE_FULL_SET;
-    $order->save();
+    $order->save(false, ["type"]);
 
-    $userId = $user->id;
-    $user = User::model()->findByPk($userId);
-
+    $user->refresh();
     $afterChangeSpent = $user->getTotalSpent($time);
 
-    $diff = $afterChangeSpent - $defaultSpent;
-
-    $this->assertEquals(10, $diff);
+    $this->assertEquals(10, $afterChangeSpent - $defaultSpent);
   }
 
 
