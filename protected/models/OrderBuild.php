@@ -23,7 +23,7 @@ class OrderBuild extends Order
    * @return $this self
    */
   public function withMonthlyDelivery() {
-    $this->delivery_type = Order::DELIVERY_TYPE_MONTHLY;
+    $this->delivery_type = Delivery::DELIVERY_TYPE_MONTHLY;
     return $this;
   }
 
@@ -31,7 +31,7 @@ class OrderBuild extends Order
    * @return $this self
    */
   public function withTwiceInMonthDelivery() {
-    $this->delivery_type = Order::DELIVERY_TYPE_TWICE_A_MONTH;
+    $this->delivery_type = Delivery::DELIVERY_TYPE_TWICE_A_MONTH;
     return $this;
   }
 

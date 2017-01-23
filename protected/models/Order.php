@@ -28,35 +28,16 @@ class Order extends CActiveRecord
   const TYPE_WITH_GEL_SET = 1;
   const TYPE_FULL_SET = 2;
 
-  const DELIVERY_TYPE_NONE = 'none';
-  const DELIVERY_TYPE_ONCE_IN_TWO_MONTHS = 'once_in_two_months';
-  const DELIVERY_TYPE_MONTHLY = 'monthly';
-  const DELIVERY_TYPE_TWICE_A_MONTH = 'twice_a_month';
-
   public static $typeTitles = [
     self::TYPE_ONE_SHAVER_SET => "только бритвенный станок",
     self::TYPE_WITH_GEL_SET => "бритвенный станок + гель для бритья",
     self::TYPE_FULL_SET => "бритвенный станок + гель + средство после бритья",
   ];
 
-  public static $deliveryTypeTitles = [
-    self::DELIVERY_TYPE_NONE => "Не доставлять",
-    self::DELIVERY_TYPE_ONCE_IN_TWO_MONTHS => "Раз в два месяца",
-    self::DELIVERY_TYPE_MONTHLY => "Раз в месяц",
-    self::DELIVERY_TYPE_TWICE_A_MONTH => "Два раза в месяц",
-  ];
-
   public static $typePrices = [
     self::TYPE_ONE_SHAVER_SET => 1,
     self::TYPE_WITH_GEL_SET => 9,
     self::TYPE_FULL_SET => 19,
-  ];
-
-  public static $deliveryTypeIntervals = [
-    self::DELIVERY_TYPE_ONCE_IN_TWO_MONTHS => 60,
-    self::DELIVERY_TYPE_MONTHLY => 30,
-    self::DELIVERY_TYPE_TWICE_A_MONTH => 15,
-    self::DELIVERY_TYPE_NONE => 0,
   ];
 
   public function tableName() {
@@ -133,7 +114,7 @@ class Order extends CActiveRecord
       );
 
       if ($this->delivery_started < $this->created) {
-        $this->delivery_started = $this->nextDelivery($this->delivery_started);
+        $this->delivery_started = $this->getDelivery()->nextDelivery($this->delivery_started) ?: $this->created;
       }
     }
 
@@ -150,40 +131,10 @@ class Order extends CActiveRecord
     return parent::afterFind();
   }
 
-  public function nextDelivery($time) {
-    if ($this->delivery_type == self::DELIVERY_TYPE_ONCE_IN_TWO_MONTHS) {
-      return strtotime("+2 month", $time);
-    } elseif ($this->delivery_type == self::DELIVERY_TYPE_MONTHLY) {
-      return strtotime("+1 month", $time);
-    } elseif ($this->delivery_type == self::DELIVERY_TYPE_TWICE_A_MONTH) {
-      $day = date("j", $time);
-      if ($day <= 15) {
-        return strtotime("+15 days", $time);
-      } else {
-        return strtotime("-15 days", $time);
-      }
-    } else {
-      return $this->created;
-    }
-  }
-
-  public function previousDelivery($time) {
-    if ($this->delivery_type == self::DELIVERY_TYPE_ONCE_IN_TWO_MONTHS) {
-      return strtotime("-2 month", $time);
-    } elseif ($this->delivery_type == self::DELIVERY_TYPE_MONTHLY) {
-      return strtotime("-1 month", $time);
-    } elseif ($this->delivery_type == self::DELIVERY_TYPE_TWICE_A_MONTH) {
-      $day = date("j", $time);
-      if ($day > 15) {
-        return strtotime("-15 days", $time);
-      } else {
-        $time = strtotime("-1 month", $time);
-        return strtotime("+15 days", $time);
-      }
-    } else {
-      return $this->created;
-    }
-
+  public function getDelivery() {
+    $Delivery = new Delivery();
+    $Delivery->type = $this->delivery_type;
+    return $Delivery;
   }
 
   public function periodElapsed($time = null) {
@@ -192,11 +143,11 @@ class Order extends CActiveRecord
     $firstTime = $this->getStartFrom();
 
     if ($time < $firstTime) return 0;
-    if ($this->delivery_type == self::DELIVERY_TYPE_NONE) return 1;
+    if ($this->delivery_type == Delivery::DELIVERY_TYPE_NONE) return 1;
 
     $count = 0;
     while ($time > $firstTime) {
-      $time = $this->previousDelivery($time);
+      $time = $this->getDelivery()->previousDelivery($time) ?: $this->created;
       $count++;
     }
     $count = $count ?: 1;
@@ -205,13 +156,13 @@ class Order extends CActiveRecord
   }
 
   public function deliveredInTimestamp($timestamp) {
-    if ($this->delivery_type == self::DELIVERY_TYPE_NONE) return false;
+    if ($this->delivery_type == Delivery::DELIVERY_TYPE_NONE) return false;
 
     $firstTime = $this->getStartFrom();
     $time = $timestamp;
 
     while ($time > $firstTime) {
-      $time = $this->previousDelivery($time);
+      $time = $this->getDelivery()->previousDelivery($time) ?: $this->created;
     }
 
     return $time == $firstTime;
@@ -219,47 +170,12 @@ class Order extends CActiveRecord
   }
 
   public function stop() {
-    $this->delivery_type = self::DELIVERY_TYPE_NONE;
+    $this->delivery_type = Delivery::DELIVERY_TYPE_NONE;
     $this->save(false);
   }
 
   public function getStartFrom() {
     return $this->delivery_started ?: $this->created;
-  }
-
-  public static function getLabelByType($i, $deliveryType, $full = false) {
-    $label = null;
-
-    if ($deliveryType == self::DELIVERY_TYPE_ONCE_IN_TWO_MONTHS) {
-      $label = "$i числа каждого второго месяца";
-    }
-    if ($deliveryType == self::DELIVERY_TYPE_MONTHLY) {
-      $label = "$i числа каждого месяца";
-    }
-    if ($deliveryType == self::DELIVERY_TYPE_TWICE_A_MONTH) {
-      if ($i <= 15)
-        $label = "$i и " . ($i + 15) . " числа каждого месяца";
-      if ($i > 15 && $full) {
-        $label = ($i - 15) . " и $i числа каждого месяца";
-      }
-    }
-
-    return $label;
-  }
-
-  public static function getDeliveryDayOfMonth($deliveryType) {
-    $array = [];
-
-    for ($i = 0; $i++ < 30;) {
-
-      $label = self::getLabelByType($i, $deliveryType);
-
-      if (!$label) continue;
-
-      $array[$i] = $label;
-    }
-
-    return $array;
   }
 
   public function validateLogin() {
@@ -298,7 +214,7 @@ class Order extends CActiveRecord
 
   public function getDayLabel() {
     if (!$this->deliveryDayOfTheMonth) return null;
-    return self::getLabelByType($this->deliveryDayOfTheMonth, $this->delivery_type, true);
+    return Delivery::getLabelByType($this->deliveryDayOfTheMonth, $this->delivery_type, true);
   }
 
 }

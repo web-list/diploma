@@ -32,7 +32,7 @@ $this->widget("zii.widgets.grid.CGridView", [
     [
       "name" => "delivery_type",
       "value" => function ($model) {
-        return Order::$deliveryTypeTitles[$model->delivery_type];
+        return Delivery::$deliveryTypeTitles[$model->delivery_type];
       }
     ],
     "dayLabel",
@@ -45,7 +45,7 @@ $this->widget("zii.widgets.grid.CGridView", [
     [
       "type" => "raw",
       "value" => function ($model) {
-        return $model->delivery_type == Order::DELIVERY_TYPE_NONE ? "" : CHtml::link("Остановить", ["stop", "id" => $model->id]);
+        return $model->delivery_type == Delivery::DELIVERY_TYPE_NONE ? "" : CHtml::link("Остановить", ["stop", "id" => $model->id]);
       }
     ]
   ]

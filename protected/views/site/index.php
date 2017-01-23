@@ -32,11 +32,11 @@ $form = $this->beginWidget("CActiveForm"); ?>
 
   <div class="row">
     <?= $form->labelEx($order, "delivery_type") ?>
-    <?= $form->dropDownList($order, "delivery_type", Order::$deliveryTypeTitles); ?>
+    <?= $form->dropDownList($order, "delivery_type", Delivery::$deliveryTypeTitles); ?>
   </div>
 
-  <?php foreach (Order::$deliveryTypeTitles as $type => $title): ?>
-    <?php $days = Order::getDeliveryDayOfMonth($type); ?>
+  <?php foreach (Delivery::$deliveryTypeTitles as $type => $title): ?>
+    <?php $days = Delivery::getDeliveryDayOfMonth($type); ?>
 
     <?php if (count($days)): ?>
       <div class="row js-day" data-type="<?= $type ?>">
