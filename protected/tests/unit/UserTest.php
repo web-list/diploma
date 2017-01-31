@@ -3,6 +3,11 @@
 class UserTest extends CTestCase
 {
 
+  public function setUp() {
+    require_once "dsl/OrderBuild.php";
+    return parent::setUp();
+  }
+
   public function testWhenUserChooseWithGelSetAndMonthlyDeliveryThenAfterThreeMonthsSpent27Dollars() {
 
     $user = new User();
