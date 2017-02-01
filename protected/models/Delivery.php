@@ -4,6 +4,8 @@ class Delivery
 {
 
   public $type = self::DELIVERY_TYPE_NONE;
+  public $startFrom;
+  public $created;
 
   const DELIVERY_TYPE_NONE = 'none';
   const DELIVERY_TYPE_ONCE_IN_TWO_MONTHS = 'once_in_two_months';
@@ -111,6 +113,37 @@ class Delivery
     }
 
     return $time;
+  }
+
+  public function countOfPeriodElapsed($time = null) {
+    if (!$time) $time = time();
+
+    $firstTime = $this->startFrom;
+
+    if ($time < $firstTime) return 0;
+    if ($this->type == Delivery::DELIVERY_TYPE_NONE) return 1;
+
+    $count = 0;
+    while ($time > $firstTime) {
+      $time = $this->previousDelivery($time) ?: $this->created;
+      $count++;
+    }
+    $count = $count ?: 1;
+
+    return $count;
+  }
+
+  public function makeNow($timestamp) {
+    if ($this->type == Delivery::DELIVERY_TYPE_NONE) return false;
+
+    $firstTime = $this->startFrom;
+    $time = $timestamp;
+
+    while ($time > $firstTime) {
+      $time = $this->previousDelivery($time) ?: $this->created;
+    }
+
+    return $time == $firstTime;
   }
 
 }

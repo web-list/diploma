@@ -54,7 +54,7 @@ class UserTest extends CTestCase
     $defaultSpent = $user->getTotalSpent($time);
 
     $order->refresh();
-    $order->type = Order::TYPE_FULL_SET;
+    $order->type = Product::TYPE_FULL_SET;
     $order->save(false, ["type"]);
 
     $user->refresh();

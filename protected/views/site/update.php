@@ -11,23 +11,9 @@ $form = $this->beginWidget("CActiveForm"); ?>
 
 <div class="form p20">
 
-  <?php if (Yii::app()->user->isGuest): ?>
-    <div class="row">
-      <?= $form->labelEx($order, "userLogin") ?>
-      <?= $form->textField($order, "userLogin"); ?>
-      <?= $form->error($order, "userLogin"); ?>
-    </div>
-
-    <div class="row">
-      <?= $form->labelEx($order, "userPassword") ?>
-      <?= $form->passwordField($order, "userPassword"); ?>
-      <?= $form->error($order, "userPassword"); ?>
-    </div>
-  <?php endif; ?>
-
   <div class="row">
     <?= $form->labelEx($order, "type") ?>
-    <?= $form->dropDownList($order, "type", Order::$typeTitles); ?>
+    <?= $form->dropDownList($order, "type", Product::$typeTitles); ?>
   </div>
 
   <div class="row">
@@ -49,7 +35,7 @@ $form = $this->beginWidget("CActiveForm"); ?>
 
 
   <div class="row">
-    <?= CHtml::submitButton($order->isNewRecord ? "Оформить заказ" : "Сохранить"); ?>
+    <?= CHtml::submitButton("Сохранить изменения"); ?>
   </div>
 
 </div>

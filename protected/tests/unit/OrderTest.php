@@ -5,27 +5,27 @@ class OrderTest extends CTestCase
 
   public function testWhenOneShaverSetChooseThenPriceIsOneDollar() {
     $order = new Order();
-    $order->type = Order::TYPE_ONE_SHAVER_SET;
+    $order->type = Product::TYPE_ONE_SHAVER_SET;
 
-    $price = $order->getPrice();
+    $price = $order->getProduct()->getPrice();
 
     $this->assertEquals(1, $price);
   }
 
   public function testWhenWithGelSetChooseThenPriceIsNineDollars() {
     $order = new Order();
-    $order->type = Order::TYPE_WITH_GEL_SET;
+    $order->type = Product::TYPE_WITH_GEL_SET;
 
-    $price = $order->getPrice();
+    $price = $order->getProduct()->getPrice();
 
     $this->assertEquals(9, $price);
   }
 
   public function testWhenFullSetChooseThenPriceIsNineteenDollars() {
     $order = new Order();
-    $order->type = Order::TYPE_FULL_SET;
+    $order->type = Product::TYPE_FULL_SET;
 
-    $price = $order->getPrice();
+    $price = $order->getProduct()->getPrice();
 
     $this->assertEquals(19, $price);
   }
@@ -37,7 +37,7 @@ class OrderTest extends CTestCase
 
     $time = $order->created;
     $time = strtotime("+2 month", $time);
-    $delivered = $order->deliveredInTimestamp($time);
+    $delivered = $order->getDelivery()->makeNow($time);
 
     $this->assertTrue($delivered);
   }
@@ -50,7 +50,7 @@ class OrderTest extends CTestCase
     $time = $order->created;
     $time = strtotime("+1 month", $time);
 
-    $delivered = $order->deliveredInTimestamp($time);
+    $delivered = $order->getDelivery()->makeNow($time);
 
     $this->assertTrue($delivered);
   }
@@ -63,7 +63,7 @@ class OrderTest extends CTestCase
     $time = $order->created;
     $time = strtotime("+3 month", $time);
 
-    $delivered = $order->deliveredInTimestamp($time);
+    $delivered = $order->getDelivery()->makeNow($time);
 
     $this->assertTrue($delivered);
   }
@@ -77,7 +77,7 @@ class OrderTest extends CTestCase
 
     $time = Delivery::plusHalfMonth($time);
 
-    $delivered = $order->deliveredInTimestamp($time);
+    $delivered = $order->getDelivery()->makeNow($time);
 
     $this->assertTrue($delivered);
   }
@@ -93,7 +93,7 @@ class OrderTest extends CTestCase
     $time = $order->delivery_started;
     $time = strtotime("+1 month", $time);
 
-    $delivered = $order->deliveredInTimestamp($time);
+    $delivered = $order->getDelivery()->makeNow($time);
 
     $this->assertTrue($delivered);
   }
@@ -118,7 +118,7 @@ class OrderTest extends CTestCase
       date("Y", $time) + 1
     );
 
-    $delivered = $order->deliveredInTimestamp($time);
+    $delivered = $order->getDelivery()->makeNow($time);
 
     $this->assertTrue($delivered);
   }
@@ -133,7 +133,7 @@ class OrderTest extends CTestCase
 
     $time = time() + 30 * Order::ONE_DAY_SECONDS;
 
-    $delivered = $order->deliveredInTimestamp($time);
+    $delivered = $order->getDelivery()->makeNow($time);
 
     $this->assertFalse($delivered);
   }
@@ -155,7 +155,7 @@ class OrderTest extends CTestCase
     $time = $order->getStartFrom();
     $time = Delivery::plusHalfMonth($time);
 
-    $delivered = $order->deliveredInTimestamp($time);
+    $delivered = $order->getDelivery()->makeNow($time);
 
     $this->assertTrue($delivered);
   }

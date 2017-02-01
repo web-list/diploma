@@ -1,7 +1,7 @@
 <?php
 /**
  * @var $this SiteController
- * @var $model Order
+ * @var $model OrderSearch
  * @var $time integer
  */
 
@@ -25,7 +25,7 @@ $this->widget("zii.widgets.grid.CGridView", [
     [
       "name" => "type",
       "value" => function ($model) {
-        return Order::$typeTitles[$model->type];
+        return Product::$typeTitles[$model->type];
       }
     ],
     "price",

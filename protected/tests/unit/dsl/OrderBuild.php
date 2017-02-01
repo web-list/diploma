@@ -39,7 +39,7 @@ class OrderBuild extends Order
    * @return $this self
    */
   public function setProductWithGelSet() {
-    $this->type = Order::TYPE_WITH_GEL_SET;
+    $this->type = Product::TYPE_WITH_GEL_SET;
     return $this;
   }
 
@@ -47,7 +47,7 @@ class OrderBuild extends Order
    * @return $this self
    */
   public function setProductFullSet() {
-    $this->type = Order::TYPE_FULL_SET;
+    $this->type = Product::TYPE_FULL_SET;
     return $this;
   }
 

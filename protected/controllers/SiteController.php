@@ -31,26 +31,30 @@ class SiteController extends Controller
   public $layout = 'main';
 
   public function actionIndex() {
-    $order = new Order(Yii::app()->user->isGuest ? "newOrder" : "create");
-    if (!Yii::app()->user->isGuest) $order->user_id = Yii::app()->user->id;
+    $model = new OrderForm(Yii::app()->user->isGuest ? "newOrder" : "create");
+    if (!Yii::app()->user->isGuest) $model->userId = Yii::app()->user->id;
 
-    if ($_POST["Order"]) {
-      $order->attributes = $_POST["Order"];
+    if ($_POST["OrderForm"]) {
+      $model->attributes = $_POST["OrderForm"];
 
-      if ($order->save()) {
-        if (Yii::app()->user->isGuest && $order->user_id) {
+      if ($model->save()) {
+
+        if (Yii::app()->user->isGuest && $model->userId) {
           $form = new LoginForm();
-          $form->username = $order->user->login;
-          $form->password = $order->user->password;
+          $form->username = $model->user->login;
+          $form->password = $model->user->password;
           $form->login();
         }
         $this->redirect(["list"]);
       }
 
+      //var_dump($model->getErrors());
+      //Yii::app()->end();
+
     }
 
-    $this->render('index', [
-      "order" => $order,
+    $this->render('create', [
+      "model" => $model,
     ]);
   }
 
@@ -61,7 +65,7 @@ class SiteController extends Controller
       $time = strtotime($time);
     }
 
-    $model = new Order("search");
+    $model = new OrderSearch("search");
     $model->unsetAttributes();
     $model->user_id = Yii::app()->user->id;
 
@@ -118,7 +122,7 @@ class SiteController extends Controller
       }
 
     }
-    $this->render("index", ["order" => $model]);
+    $this->render("update", ["order" => $model]);
   }
 
   /**
