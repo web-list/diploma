@@ -40,4 +40,8 @@ class Period
     $this->time = strtotime("-2 month", $this->time);
   }
 
+  public function afterTwoMonths() {
+    $this->time = strtotime("+2 month", $this->time);
+  }
+
 }

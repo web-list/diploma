@@ -66,4 +66,13 @@ class PeriodTest extends CTestCase
     $this->assertEquals(strtotime("12.11.2014"), $period->time);
   }
 
+  public function testFor30December2019AfterTwoMonthsIs1stMarch2020() {
+    $period = new Period();
+    $period->time = strtotime("30.12.2019");
+
+    $period->afterTwoMonths();
+
+    $this->assertEquals(strtotime("01.03.2020"), $period->time);
+  }
+
 }
