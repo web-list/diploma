@@ -28,7 +28,7 @@ class Delivery
 
   public function getPeriod() {
     $period = new Period();
-
+    $period->time = $this->startFrom ?: $this->created;
     return $period;
   }
 
@@ -48,21 +48,21 @@ class Delivery
     return $period->time;
   }
 
-  public function previousDelivery() {
-    $period = $this->getPeriod();
-
-    if ($this->type == self::DELIVERY_TYPE_ONCE_IN_TWO_MONTHS) {
-      $period->beforeTwoMonths();
-    } elseif ($this->type == self::DELIVERY_TYPE_MONTHLY) {
-      $period->beforeMonth();
-    } elseif ($this->type == self::DELIVERY_TYPE_TWICE_A_MONTH) {
-      $period->beforeHalfMonth();
-    } else {
-      return null;
-    }
-
-    return $period->time;
-  }
+  //public function previousDelivery() {
+  //  $period = $this->getPeriod();
+  //
+  //  if ($this->type == self::DELIVERY_TYPE_ONCE_IN_TWO_MONTHS) {
+  //    $period->beforeTwoMonths();
+  //  } elseif ($this->type == self::DELIVERY_TYPE_MONTHLY) {
+  //    $period->beforeMonth();
+  //  } elseif ($this->type == self::DELIVERY_TYPE_TWICE_A_MONTH) {
+  //    $period->beforeHalfMonth();
+  //  } else {
+  //    return null;
+  //  }
+  //
+  //  return $period->time;
+  //}
 
   public static function getLabelByType($day, $deliveryType, $full = false) {
     $label = null;
@@ -99,17 +99,21 @@ class Delivery
     return $array;
   }
 
-  public function countOfPeriodElapsed($time = null) {
-    if (!$time) $time = time();
-
-    $firstTime = $this->startFrom;
-
-    if ($time < $firstTime) return 0;
+  public function countOfPeriodElapsed($time) {
+    if ($time < $this->getPeriod()->time) return 0;
     if ($this->type == Delivery::DELIVERY_TYPE_NONE) return 1;
 
     $count = 0;
-    while ($time > $firstTime) {
-      $time = $this->previousDelivery($time) ?: $this->created;
+    $period = new Period();
+    $period->time = $time;
+    while ($period->time > $this->getPeriod()->time) {
+      if ($this->type == self::DELIVERY_TYPE_ONCE_IN_TWO_MONTHS) {
+        $period->beforeTwoMonths();
+      } elseif ($this->type == self::DELIVERY_TYPE_MONTHLY) {
+        $period->beforeMonth();
+      } elseif ($this->type == self::DELIVERY_TYPE_TWICE_A_MONTH) {
+        $period->beforeHalfMonth();
+      }
       $count++;
     }
     $count = $count ?: 1;
@@ -117,17 +121,25 @@ class Delivery
     return $count;
   }
 
-  public function makeNow($timestamp) {
+  public function makeInTime($timestamp) {
     if ($this->type == Delivery::DELIVERY_TYPE_NONE) return false;
 
-    $firstTime = $this->startFrom;
-    $time = $timestamp;
+    $period = new Period();
+    $period->time = $timestamp;
 
-    while ($time > $firstTime) {
-      $time = $this->previousDelivery($time) ?: $this->created;
+    while ($this->getPeriod()->time > $period->time) {
+
+      if ($this->type == self::DELIVERY_TYPE_ONCE_IN_TWO_MONTHS) {
+        $period->beforeTwoMonths();
+      } elseif ($this->type == self::DELIVERY_TYPE_MONTHLY) {
+        $period->beforeMonth();
+      } elseif ($this->type == self::DELIVERY_TYPE_TWICE_A_MONTH) {
+        $period->beforeHalfMonth();
+      }
+
     }
 
-    return $time == $firstTime;
+    return $timestamp == $period->time;
   }
 
 }

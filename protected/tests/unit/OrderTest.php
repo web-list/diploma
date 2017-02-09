@@ -37,7 +37,7 @@ class OrderTest extends CTestCase
 
     $time = $order->created;
     $time = strtotime("+2 month", $time);
-    $delivered = $order->getDelivery()->makeNow($time);
+    $delivered = $order->getDelivery()->makeInTime($time);
 
     $this->assertTrue($delivered);
   }
@@ -50,7 +50,7 @@ class OrderTest extends CTestCase
     $time = $order->created;
     $time = strtotime("+1 month", $time);
 
-    $delivered = $order->getDelivery()->makeNow($time);
+    $delivered = $order->getDelivery()->makeInTime($time);
 
     $this->assertTrue($delivered);
   }
@@ -63,7 +63,7 @@ class OrderTest extends CTestCase
     $time = $order->created;
     $time = strtotime("+3 month", $time);
 
-    $delivered = $order->getDelivery()->makeNow($time);
+    $delivered = $order->getDelivery()->makeInTime($time);
 
     $this->assertTrue($delivered);
   }
@@ -77,7 +77,7 @@ class OrderTest extends CTestCase
     $period =  $delivery->getPeriod();
     $period->afterHalfMonth();
 
-    $delivered = $delivery->makeNow($period->time);
+    $delivered = $delivery->makeInTime($period->time);
 
     $this->assertTrue($delivered);
   }
@@ -93,7 +93,7 @@ class OrderTest extends CTestCase
     $time = $order->delivery_started;
     $time = strtotime("+1 month", $time);
 
-    $delivered = $order->getDelivery()->makeNow($time);
+    $delivered = $order->getDelivery()->makeInTime($time);
 
     $this->assertTrue($delivered);
   }
@@ -118,7 +118,7 @@ class OrderTest extends CTestCase
       date("Y", $time) + 1
     );
 
-    $delivered = $order->getDelivery()->makeNow($time);
+    $delivered = $order->getDelivery()->makeInTime($time);
 
     $this->assertTrue($delivered);
   }
@@ -133,7 +133,7 @@ class OrderTest extends CTestCase
 
     $time = time() + 30 * Order::ONE_DAY_SECONDS;
 
-    $delivered = $order->getDelivery()->makeNow($time);
+    $delivered = $order->getDelivery()->makeInTime($time);
 
     $this->assertFalse($delivered);
   }
@@ -156,7 +156,7 @@ class OrderTest extends CTestCase
     $period = $delivery->getPeriod();
     $period->afterHalfMonth();
 
-    $delivered = $delivery->makeNow($period->time);
+    $delivered = $delivery->makeInTime($period->time);
 
     $this->assertTrue($delivered);
   }
