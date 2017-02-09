@@ -49,4 +49,12 @@ class PeriodTest extends CTestCase
     $this->assertEquals(strtotime("28.03.2017"), $period->time);
   }
 
+  public function testFor22SeptemberBeforeMonthIs22August() {
+    $period = new Period();
+    $period->time = strtotime("22.09.2017");
+    $period->minusMonth();
+
+    $this->assertEquals(strtotime("22.08.2017"), $period->time);
+  }
+
 }

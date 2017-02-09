@@ -32,4 +32,8 @@ class Period
     $this->time = strtotime("+1 month", $this->time);
   }
 
+  public function minusMonth() {
+    $this->time = strtotime("-1 month", $this->time);
+  }
+
 }
