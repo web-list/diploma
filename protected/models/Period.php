@@ -19,7 +19,13 @@ class Period
   }
 
   public function minusHalfMonth() {
-    $this->time = strtotime("-15 days", $this->time);
+    $day = date("j", $this->time);
+    if ($day > 15) {
+      $this->time = strtotime("-15 days",  $this->time);
+    } else {
+      $this->time = strtotime("-1 month",  $this->time);
+      $this->time = strtotime("+15 days",  $this->time);
+    }
   }
 
 }
