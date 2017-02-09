@@ -54,4 +54,14 @@ class Period
     }
   }
 
+  public function afterDeliveryType($deliveryType) {
+    if ($deliveryType == Delivery::DELIVERY_TYPE_ONCE_IN_TWO_MONTHS) {
+      $this->afterTwoMonths();
+    } elseif ($deliveryType == Delivery::DELIVERY_TYPE_MONTHLY) {
+      $this->afterMonth();
+    } elseif ($deliveryType == Delivery::DELIVERY_TYPE_TWICE_A_MONTH) {
+      $this->afterHalfMonth();
+    }
+  }
+
 }

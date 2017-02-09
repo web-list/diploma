@@ -76,7 +76,7 @@ class Order extends CActiveRecord
       );
 
       if ($this->delivery_started < $this->created) {
-        $this->delivery_started = $this->getDelivery()->nextDelivery($this->delivery_started) ?: $this->created;
+        $this->delivery_started = $this->getDelivery()->getPeriod()->afterDeliveryType($this->getDelivery()->type) ?: $this->created;
       }
     }
   }

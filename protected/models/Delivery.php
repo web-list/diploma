@@ -48,22 +48,6 @@ class Delivery
     return $period->time;
   }
 
-  //public function previousDelivery() {
-  //  $period = $this->getPeriod();
-  //
-  //  if ($this->type == self::DELIVERY_TYPE_ONCE_IN_TWO_MONTHS) {
-  //    $period->beforeTwoMonths();
-  //  } elseif ($this->type == self::DELIVERY_TYPE_MONTHLY) {
-  //    $period->beforeMonth();
-  //  } elseif ($this->type == self::DELIVERY_TYPE_TWICE_A_MONTH) {
-  //    $period->beforeHalfMonth();
-  //  } else {
-  //    return null;
-  //  }
-  //
-  //  return $period->time;
-  //}
-
   public static function getLabelByType($day, $deliveryType, $full = false) {
     $label = null;
 
