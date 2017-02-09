@@ -28,4 +28,8 @@ class Period
     }
   }
 
+  public function plusMonth() {
+    $this->time = strtotime("+1 month", $this->time);
+  }
+
 }

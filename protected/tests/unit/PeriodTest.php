@@ -41,4 +41,12 @@ class PeriodTest extends CTestCase
     $this->assertEquals(strtotime("19.02.2017"), $period->time);
   }
 
+  public function testFor28FebruaryAfterMonthIs28March() {
+    $period = new Period();
+    $period->time = strtotime("28.02.2017");
+    $period->plusMonth();
+
+    $this->assertEquals(strtotime("28.03.2017"), $period->time);
+  }
+
 }
