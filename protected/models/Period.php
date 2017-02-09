@@ -18,4 +18,8 @@ class Period
 
   }
 
+  public function minusHalfMonth() {
+    $this->time = strtotime("-15 days", $this->time);
+  }
+
 }
