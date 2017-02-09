@@ -36,4 +36,8 @@ class Period
     $this->time = strtotime("-1 month", $this->time);
   }
 
+  public function beforeTwoMonths() {
+    $this->time = strtotime("-2 month", $this->time);
+  }
+
 }
