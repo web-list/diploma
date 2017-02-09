@@ -32,22 +32,6 @@ class Delivery
     return $period;
   }
 
-  public function nextDelivery() {
-    $period = $this->getPeriod();
-
-    if ($this->type == self::DELIVERY_TYPE_ONCE_IN_TWO_MONTHS) {
-      $period->afterTwoMonths();
-    } elseif ($this->type == self::DELIVERY_TYPE_MONTHLY) {
-      $period->afterMonth();
-    } elseif ($this->type == self::DELIVERY_TYPE_TWICE_A_MONTH) {
-      $period->afterHalfMonth();
-    } else {
-      return null;
-    }
-
-    return $period->time;
-  }
-
   public static function getLabelByType($day, $deliveryType, $full = false) {
     $label = null;
 
