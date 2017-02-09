@@ -5,7 +5,7 @@ class Period
 
   public $time;
 
-  public function plusHalfMonth() {
+  public function afterHalfMonth() {
 
     $day = date("j", $this->time);
 
@@ -18,7 +18,7 @@ class Period
 
   }
 
-  public function minusHalfMonth() {
+  public function beforeHalfMonth() {
     $day = date("j", $this->time);
     if ($day > 15) {
       $this->time = strtotime("-15 days",  $this->time);
@@ -28,11 +28,11 @@ class Period
     }
   }
 
-  public function plusMonth() {
+  public function afterMonth() {
     $this->time = strtotime("+1 month", $this->time);
   }
 
-  public function minusMonth() {
+  public function beforeMonth() {
     $this->time = strtotime("-1 month", $this->time);
   }
 
