@@ -73,11 +73,11 @@ class OrderTest extends CTestCase
     $order->delivery_type = Delivery::DELIVERY_TYPE_TWICE_A_MONTH;
     $order->save();
 
-    $time = $order->created;
+    $delivery = $order->getDelivery();
+    $period =  $delivery->getPeriod();
+    $period->afterHalfMonth();
 
-    $time = Delivery::plusHalfMonth($time);
-
-    $delivered = $order->getDelivery()->makeNow($time);
+    $delivered = $delivery->makeNow($period->time);
 
     $this->assertTrue($delivered);
   }
@@ -152,10 +152,11 @@ class OrderTest extends CTestCase
     $order->delivery_type = Delivery::DELIVERY_TYPE_TWICE_A_MONTH;
     $order->save();
 
-    $time = $order->getStartFrom();
-    $time = Delivery::plusHalfMonth($time);
+    $delivery = $order->getDelivery();
+    $period = $delivery->getPeriod();
+    $period->afterHalfMonth();
 
-    $delivered = $order->getDelivery()->makeNow($time);
+    $delivered = $delivery->makeNow($period->time);
 
     $this->assertTrue($delivered);
   }

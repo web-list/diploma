@@ -26,29 +26,42 @@ class Delivery
     self::DELIVERY_TYPE_NONE => 0,
   ];
 
-  public function nextDelivery($time) {
-    if ($this->type == self::DELIVERY_TYPE_ONCE_IN_TWO_MONTHS) {
-      return strtotime("+2 month", $time);
-    } elseif ($this->type == self::DELIVERY_TYPE_MONTHLY) {
-      return strtotime("+1 month", $time);
-    } elseif ($this->type == self::DELIVERY_TYPE_TWICE_A_MONTH) {
-      return self::plusHalfMonth($time);
-    } else {
-      return null;
-    }
+  public function getPeriod() {
+    $period = new Period();
+
+    return $period;
   }
 
-  public function previousDelivery($time) {
+  public function nextDelivery() {
+    $period = $this->getPeriod();
+
     if ($this->type == self::DELIVERY_TYPE_ONCE_IN_TWO_MONTHS) {
-      return strtotime("-2 month", $time);
+      $period->afterTwoMonths();
     } elseif ($this->type == self::DELIVERY_TYPE_MONTHLY) {
-      return strtotime("-1 month", $time);
+      $period->afterMonth();
     } elseif ($this->type == self::DELIVERY_TYPE_TWICE_A_MONTH) {
-      return self::minusHalfMonth($time);
+      $period->afterHalfMonth();
     } else {
       return null;
     }
 
+    return $period->time;
+  }
+
+  public function previousDelivery() {
+    $period = $this->getPeriod();
+
+    if ($this->type == self::DELIVERY_TYPE_ONCE_IN_TWO_MONTHS) {
+      $period->beforeTwoMonths();
+    } elseif ($this->type == self::DELIVERY_TYPE_MONTHLY) {
+      $period->beforeMonth();
+    } elseif ($this->type == self::DELIVERY_TYPE_TWICE_A_MONTH) {
+      $period->beforeHalfMonth();
+    } else {
+      return null;
+    }
+
+    return $period->time;
   }
 
   public static function getLabelByType($day, $deliveryType, $full = false) {
@@ -84,35 +97,6 @@ class Delivery
     }
 
     return $array;
-  }
-
-  public static function plusHalfMonth($time = null) {
-    if (!$time) $time = time();
-
-    $day = date("j", $time);
-
-    if ($day > 15) {
-      $time = strtotime("+1 month", $time);
-      $time = strtotime("-15 days", $time);
-    } else {
-      $time = strtotime("+15 days", $time);
-    }
-
-    return $time;
-  }
-
-  public static function minusHalfMonth($time = null) {
-    if (!$time) $time = time();
-
-    $day = date("j", $time);
-    if ($day > 15) {
-      $time = strtotime("-15 days", $time);
-    } else {
-      $time = strtotime("-1 month", $time);
-      $time = strtotime("+15 days", $time);
-    }
-
-    return $time;
   }
 
   public function countOfPeriodElapsed($time = null) {
