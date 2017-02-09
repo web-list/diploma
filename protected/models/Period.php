@@ -44,4 +44,14 @@ class Period
     $this->time = strtotime("+2 month", $this->time);
   }
 
+  public function beforeDeliveryType($deliveryType) {
+    if ($deliveryType == Delivery::DELIVERY_TYPE_ONCE_IN_TWO_MONTHS) {
+      $this->beforeTwoMonths();
+    } elseif ($deliveryType == Delivery::DELIVERY_TYPE_MONTHLY) {
+      $this->beforeMonth();
+    } elseif ($deliveryType == Delivery::DELIVERY_TYPE_TWICE_A_MONTH) {
+      $this->beforeHalfMonth();
+    }
+  }
+
 }

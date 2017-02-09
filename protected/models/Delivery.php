@@ -107,13 +107,7 @@ class Delivery
     $period = new Period();
     $period->time = $time;
     while ($period->time > $this->getPeriod()->time) {
-      if ($this->type == self::DELIVERY_TYPE_ONCE_IN_TWO_MONTHS) {
-        $period->beforeTwoMonths();
-      } elseif ($this->type == self::DELIVERY_TYPE_MONTHLY) {
-        $period->beforeMonth();
-      } elseif ($this->type == self::DELIVERY_TYPE_TWICE_A_MONTH) {
-        $period->beforeHalfMonth();
-      }
+      $period->beforeDeliveryType($this->type);
       $count++;
     }
     $count = $count ?: 1;
@@ -128,15 +122,7 @@ class Delivery
     $period->time = $timestamp;
 
     while ($this->getPeriod()->time > $period->time) {
-
-      if ($this->type == self::DELIVERY_TYPE_ONCE_IN_TWO_MONTHS) {
-        $period->beforeTwoMonths();
-      } elseif ($this->type == self::DELIVERY_TYPE_MONTHLY) {
-        $period->beforeMonth();
-      } elseif ($this->type == self::DELIVERY_TYPE_TWICE_A_MONTH) {
-        $period->beforeHalfMonth();
-      }
-
+      $period->beforeDeliveryType($this->type);
     }
 
     return $timestamp == $period->time;
